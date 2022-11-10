@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, EventEmitter, Output, OnDestroy } from '@angular/core';
 
 import { Phrase } from 'src/shared/phrase.model';
 import { PHRASES } from './phrase-mock';
@@ -8,7 +8,7 @@ import { PHRASES } from './phrase-mock';
   templateUrl: './painel.component.html',
   styleUrls: ['./painel.component.css']
 })
-export class PainelComponent implements OnInit {
+export class PainelComponent implements OnInit, OnDestroy {
 
   public instruction: string = 'Traduza a frase'
   public phrases: Phrase[] = PHRASES
@@ -21,11 +21,17 @@ export class PainelComponent implements OnInit {
 
   public attempts: number = 3
 
+  @Output() public endGame: EventEmitter<string> = new EventEmitter()
+
   constructor() {
     this.updateRound()
   }
 
   ngOnInit(): void {
+  }
+
+  ngOnDestroy(): void {
+    
   }
 
   public updateAnswer(response: Event): void {
@@ -36,12 +42,17 @@ export class PainelComponent implements OnInit {
   public checkAnswer(): void {
 
     if(this.roundPhrase.phrasePtBr == this.response) {
-      alert('Tradução esta correta')
 
       //trocar pergunda da rodada
       this.round++
       //incrementa progresso
       this.progress = this.progress + (100 / this.phrases.length)
+
+      //venceu o jogo
+      if(this.round === 4) {
+        this.endGame.emit('vitoria')
+      }
+
       //atualiza o objeto roundPhrase
       this.updateRound()
 
@@ -50,7 +61,7 @@ export class PainelComponent implements OnInit {
       this.attempts--
 
       if(this.attempts === -1) {
-        alert('voce perdeu todas as tentaivas')
+        this.endGame.emit('derrota')
       }
 
     }
