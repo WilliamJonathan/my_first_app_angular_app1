@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 
 import { Heart } from 'src/shared/heart.model';
 
@@ -7,10 +7,9 @@ import { Heart } from 'src/shared/heart.model';
   templateUrl: './attempts.component.html',
   styleUrls: ['./attempts.component.css']
 })
-export class AttemptsComponent implements OnInit {
+export class AttemptsComponent implements OnInit, OnChanges {
 
-  public heartVoid: string = '/assets/coracao_vazio.png'
-  public heartFull: string = '/assets/coracao_cheio.png'
+  @Input() public attempts: number
 
   public hearts: Heart[] = [
     new Heart(true),
@@ -19,6 +18,14 @@ export class AttemptsComponent implements OnInit {
   ]
 
   constructor() { }
+
+  ngOnChanges(): void {
+    if(this.attempts !== this.hearts.length) {
+      let index = this.hearts.length - this.attempts
+
+      this.hearts[index - 1].full = false
+    }
+  }
 
   ngOnInit(): void {
   }
